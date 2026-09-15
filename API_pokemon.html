@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="pt-br" translate="no">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pokedex</title>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+    <style>
+        
+        body {
+            font-family: 'Press Start 2P', Arial, Helvetica, sans-serif;
+            background-color: rgb(74, 71, 71);
+        }
+
+        header {
+            display: flex;
+            align-items: center;
+            justify-content: space-around;
+            background-color: rgb(109, 36, 36);
+            color: white;
+            padding: 10px;
+            border-radius: 8px;
+        }
+
+        main {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-top: 15px;
+        }
+
+        .cards {
+            background-color: gainsboro;
+            padding: 10px;
+            margin: 10px;
+            width: 90vw;
+            height: 80px;
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            justify-content: space-between;
+            border-radius: 10px;
+            transition: all 0.3s linear;
+        }
+
+        .cards:hover {
+            transform: scale(1.05);
+            cursor: pointer;
+        }
+
+        .cards>img {
+            background-color: white;
+
+        }
+
+        .cards>p>img{
+            height: 28px;
+            width: 64px;
+        }
+
+        header>img {
+            width: 60px;
+            height: 60px;
+        }
+    </style>
+</head>
+
+<body onload="carregarApi()">
+    <header>
+        <img src="https://assets.streamlinehq.com/image/private/w_300,h_300,ar_1/f_auto/v1/icons/vector-icons-7/pokeball-xeg9gc4xzwluseur3c3mm.png/pokeball-qdt0o2i0d34nyhk4opt88.png?_a=DATAiZAAZAA0">
+        <div>
+            <input type="text" id="busca">
+        </div>
+
+        <div>
+            <label>Tipo:</label>
+            <select>
+            </select>
+        </div>
+
+    </header>
+    <main>Carregando</main>
+    <script>
+        let todosOsPokemons = [];
+        let pokemonsBuscados = [];
+
+        const coresTipos = [
+                { "tipo": "fire", "cor": "#FD7D24" },
+                { "tipo": "water", "cor": "#4592C4" },
+                { "tipo": "grass", "cor": "#77C354" },
+                { "tipo": "poison", "cor": "#905185" },
+                { "tipo": "bug", "cor": "#A8B81F" },
+                { "tipo": "flying", "cor": "#A68FEF" },
+                { "tipo": "ground", "cor": "#DFC16E" },
+                { "tipo": "electric", "cor": "#F9CF2F" },
+                { "tipo": "normal", "cor": "#A8A979" },
+                { "tipo": "fairy", "cor": "#E89FE3" },
+                { "tipo": "fighting", "cor": "#BF2F29" },
+                { "tipo": "psychic", "cor": "#F75985" },
+                { "tipo": "rock", "cor": "#BB9E38" },
+                { "tipo": "ghost", "cor": "#6E5C87" },
+                { "tipo": "dark", "cor": "#725747" },
+                { "tipo": "steel", "cor": "#B7B8D0" },
+                { "tipo": "dragon", "cor": "#693DEB" },
+                { "tipo": "ice", "cor": "#98D8D8" },
+            ]
+
+        let html = "<option>any</option>";
+        coresTipos.forEach(tipo => {
+            html += `<option>${tipo.tipo}</option>`
+        })
+        document.querySelector("select").innerHTML = html;
+
+        async function carregarApi() {
+            const fonte = await fetch("https://pokeapi.co/api/v2/pokemon");
+            const dadosFonte = await fonte.json();
+            let URLs = [];
+            for (let i = 1; i < 1009; i++) {
+                URLs.push(`https://pokeapi.co/api/v2/pokemon/${i}`);
+            }
+            let lista_dados = []
+            let dados = URLs.map(async pokemon => {
+                let resposta = await fetch(pokemon);
+                let pk = await resposta.json();
+                return pk;
+            })
+            const dadosPokemons = await Promise.all(dados);
+            todosOsPokemons = dadosPokemons;
+            console.log(todosOsPokemons);
+            montarCards(todosOsPokemons);
+        }
+
+        function montarCards(Pokemons) {
+            let cards = "";
+            Pokemons.forEach(pokemon => {
+                cards += `
+                    <div onclick="buscar('${pokemon.name}')" class="cards" id="${pokemon.id}">
+                        <img src="${pokemon.sprites.front_default}">
+                        <p id="nrNome">#${pokemon.id} - ${pokemon.name.toUpperCase()}</p>
+                        <p id="type">${pokemon.types.map(pk => `<img src="${pk.type.name}.png">`).join(" ")}</p>
+                    </div>
+                `
+            });
+            document.querySelector("main").innerHTML = cards;
+            cssCard(Pokemons);
+        }
+
+        function cssCard(Pokemons) {
+            Pokemons.forEach(pokemon => {
+                let tipo = pokemon.types[0].type.name;
+                coresTipos.forEach(corTipo => {
+                    if (tipo == corTipo.tipo) {
+                        document.getElementById(`${pokemon.id}`).style.backgroundColor = corTipo.cor;
+                        document.getElementById(`${pokemon.id}`).querySelector("img").style.backgroundColor = corTipo.cor;
+                    }
+                })
+            })
+        }
+        
+        document.querySelector("select").addEventListener("change", function(){
+            if (document.querySelector("select").value == "any"){
+                montarCards(todosOsPokemons);
+                cssCard(todosOsPokemons);
+            }
+            else{
+                todosOsPokemons.forEach(pokemon => {
+                    if(pokemon.types[0].type.name == document.querySelector("select").value){
+                        pokemonsBuscados.push(pokemon);
+                    }
+                    else{
+                        if (pokemon.types.length > 1){
+                            if(pokemon.types[1].type.name == document.querySelector("select").value){
+                                pokemonsBuscados.push(pokemon);
+                            }
+                        }
+                    }
+                })
+                montarCards(pokemonsBuscados);
+                cssCard(pokemonsBuscados);
+                pokemonsBuscados = [];
+            }
+        })
+
+        document.getElementById("busca").addEventListener("input", function(){
+            let txt = document.getElementById("busca").value;
+            let isIgual = true;
+            console.log(txt);
+            if (txt == ""){}
+            todosOsPokemons.forEach(pokemon => {
+                if (pokemon.name.length < txt.length) return;
+                for (let i = 0; i < txt.length; i++){
+                    if (txt[i].trim().toUpperCase() != pokemon.name[i].toUpperCase()){
+                        isIgual = false;
+                    }
+                }
+                if (isIgual == true) {
+                    pokemonsBuscados.push(pokemon);
+                }
+                isIgual = true;
+            })
+            montarCards(pokemonsBuscados);
+            pokemonsBuscados = [];
+        })
+
+    </script>
+</body>
+
+</html>
