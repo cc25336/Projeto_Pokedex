@@ -68,13 +68,6 @@ As imagens `.png` são os ícones de cada tipo de Pokémon, usados nos cards par
 4. **Filtro por tipo**: ao selecionar um tipo no `select`, o código filtra os Pokémon (verificando tipo primário e secundário) e remonta os cards.
 5. **Busca por nome**: a cada caractere digitado, o código filtra os Pokémon cujo nome começa com o texto digitado.
 
-## 💡 Possíveis melhorias futuras
-
-- Adicionar uma tela de detalhes ao clicar em um Pokémon (atualmente o `onclick` chama uma função `buscar()` que não está implementada).
-- Exibir status (HP, ataque, defesa etc.) e evoluções.
-- Adicionar paginação ou carregamento sob demanda (atualmente todos os 1008 Pokémon são buscados de uma vez).
-- Tornar o layout responsivo para diferentes tamanhos de tela.
-
 ## 📚 Créditos
 
 - Dados fornecidos pela [PokeAPI](https://pokeapi.co/)
