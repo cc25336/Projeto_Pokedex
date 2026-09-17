@@ -60,8 +60,8 @@
         }
 
         header>img {
-            width: 60px;
-            height: 60px;
+            width: 70px;
+            height: 70px;
         }
     </style>
 </head>
@@ -139,8 +139,7 @@
                         <img src="${pokemon.sprites.front_default}">
                         <p id="nrNome">#${pokemon.id} - ${pokemon.name.toUpperCase()}</p>
                         <p id="type">${pokemon.types.map(pk => `<img src="${pk.type.name}.png">`).join(" ")}</p>
-                    </div>
-                `
+                    </div>`
             });
             document.querySelector("main").innerHTML = cards;
             cssCard(Pokemons);
@@ -202,8 +201,6 @@
             montarCards(pokemonsBuscados);
             pokemonsBuscados = [];
         })
-
     </script>
 </body>
-
 </html>
